@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindIt AI | Lost and Found Portal</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .portal-actions {
+            max-width: 1000px;
+            margin: 45px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .portal-card {
+            background: #171f38;
+            border: 1px solid #303b5c;
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .portal-card h3 { color: #ffffff; }
+        .portal-card p { color: #b9c3dd; }
+
+        .portal-card a {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 12px 22px;
+            background: #8060f5;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .portal-card a:hover { background: #6848dc; }
+
+        header nav a {
+            color: #c9c4ff;
+            text-decoration: none;
+            margin-left: 18px;
+        }
+
+        header nav a:hover { color: white; }
+
+        .camera-section {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 25px;
+            background: #171f38;
+            border: 1px solid #303b5c;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .camera-section h2 { color: white; }
+        .camera-section p { color: #b9c3dd; }
+
+        .camera-video {
+            width: 100%;
+            max-width: 650px;
+            max-height: 420px;
+            background: #080d1c;
+            border-radius: 12px;
+            margin: 15px auto;
+            display: block;
+        }
+
+        .camera-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .camera-buttons button,
+        .report-detected-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #8060f5;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .camera-buttons button:hover,
+        .report-detected-button:hover {
+            background: #6848dc;
+        }
+
+        .camera-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #cameraStatus {
+            margin-top: 12px;
+            color: #c9c4ff;
+        }
+
+        #cameraResults {
+            margin-top: 25px;
+            color: white;
+        }
+
+        #cameraResults img {
+            width: 100%;
+            max-width: 650px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .camera-detection {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px;
+            margin: 8px auto;
+            max-width: 600px;
+            background: #222d4b;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .report-detected-button {
+            margin-top: 18px;
+            background: #13a879;
+            font-size: 15px;
+        }
+
+        .report-detected-button:hover {
+            background: #0c875f;
+        }
+
+        @media (max-width: 600px) {
+            header nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 10px;
+            }
+
+            header nav a { margin-left: 0; }
+
+            .camera-section {
+                margin: 20px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">FindIt <span>AI</span></div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/report/lost">Report Lost</a>
+        <a href="/report/found">Report Found</a>
+        <a href="/reports">View Reports</a>
+        <a href="/notifications">Notifications</a>
+    </nav>
+</header>
+
+<main>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <p class="tag">SMART OBJECT DETECTION</p>
+
+        <h1>
+            Lost something?<br>
+            <span>Let's find it.</span>
+        </h1>
+
+        <p>
+            Upload an image or use your camera and let our AI
+            identify objects using computer vision.
+        </p>
+    </section>
+
+    <!-- IMAGE UPLOAD -->
+    <section class="upload-card">
+        <h2>AI Object Detection</h2>
+
+        <p>
+            Upload a clear image of an object to identify it using
+            our YOLOv8 computer vision model.
+        </p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data">
+            <input
+                type="file"
+                name="image"
+                accept=".jpg,.jpeg,.png,.webp"
+                required
+            >
+
+            <button type="submit">Detect Objects</button>
+        </form>
+    </section>
+
+    <!-- UPLOAD DETECTION RESULTS -->
+    {% if result_image %}
+    <section class="results">
+
+        <h2>Detection Results</h2>
+
+        <img
+            class="result-img"
+            src="{{ url_for('static', filename='uploads/' + result_image) }}"
+            alt="AI detection result"
+        >
+
+        {% if detections %}
+            <h3>Objects identified</h3>
+
+            {% for item in detections %}
+                <div class="detection">
+                    <span>{{ item.name }}</span>
+                    <strong>{{ item.confidence }}% confidence</strong>
+                </div>
+            {% endfor %}
+
+            <a
+                class="report-detected-button"
+                href="{{ url_for('report_item', report_type='found', item_name=detections[0].name) }}"
+            >
+                Report This Found Item
+            </a>
+
+        {% else %}
+            <p>No objects detected. Try another image.</p>
+        {% endif %}
+
+        <p class="disclaimer">
+            AI results are suggestions. Please verify the object manually.
+        </p>
+
+    </section>
+    {% endif %}
+
+    <!-- LIVE CAMERA DETECTION -->
+    <section class="camera-section">
+
+        <h2>Live Camera Detection</h2>
+
+        <p>
+            Capture an object using your camera and let YOLOv8
+            identify it automatically.
+        </p>
+
+        <video
+            id="cameraVideo"
+            class="camera-video"
+            autoplay
+            playsinline
+            muted
+        ></video>
+
+        <canvas id="cameraCanvas" style="display:none;"></canvas>
+
+        <div class="camera-buttons">
+            <button type="button" id="startCamera">
+                Start Camera
+            </button>
+
+            <button type="button" id="captureImage" disabled>
+                Capture & Detect
+            </button>
+
+            <button type="button" id="stopCamera" disabled>
+                Stop Camera
+            </button>
+        </div>
+
+        <p id="cameraStatus">Camera is currently inactive.</p>
+
+        <div id="cameraResults"></div>
+
+    </section>
+
+    <!-- LOST AND FOUND PORTAL -->
+    <section class="portal-actions">
+
+        <div class="portal-card">
+            <h3>Lost Something?</h3>
+            <p>Submit details and an image of an item you have lost.</p>
+            <a href="/report/lost">Report Lost Item</a>
+        </div>
+
+        <div class="portal-card">
+            <h3>Found Something?</h3>
+            <p>Help someone recover their belongings by reporting an item you found.</p>
+            <a href="/report/found">Report Found Item</a>
+        </div>
+
+        <div class="portal-card">
+            <h3>Browse Reports</h3>
+            <p>Explore lost and found reports submitted through FindIt AI.</p>
+            <a href="/reports">View All Reports</a>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    FindIt AI · AI-Powered Lost and Found Portal · Computer Vision Project
+</footer>
+
+<!-- CAMERA AND REPORTING JAVASCRIPT -->
+<script>
+    const video = document.getElementById("cameraVideo");
+    const canvas = document.getElementById("cameraCanvas");
+
+    const startButton = document.getElementById("startCamera");
+    const captureButton = document.getElementById("captureImage");
+    const stopButton = document.getElementById("stopCamera");
+
+    const statusText = document.getElementById("cameraStatus");
+    const resultsDiv = document.getElementById("cameraResults");
+
+    let cameraStream = null;
+    window.cameraDetections = [];
+
+    // START CAMERA
+    startButton.addEventListener("click", async function () {
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "environment" },
+                audio: false
+            });
+
+            video.srcObject = cameraStream;
+
+            captureButton.disabled = false;
+            stopButton.disabled = false;
+            startButton.disabled = true;
+
+            statusText.textContent = "Camera started successfully.";
+
+        } catch (error) {
+            console.error(error);
+            statusText.textContent =
+                "Unable to access camera. Please allow camera permission.";
+        }
+    });
+
+    // CAPTURE IMAGE AND RUN YOLO
+    captureButton.addEventListener("click", async function () {
+
+        if (!cameraStream) {
+            statusText.textContent = "Please start the camera first.";
+            return;
+        }
+
+        captureButton.disabled = true;
+        statusText.textContent = "Running AI object detection...";
+        resultsDiv.innerHTML = "";
+        window.cameraDetections = [];
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const context = canvas.getContext("2d");
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(async function (blob) {
+
+            if (!blob) {
+                statusText.textContent = "Image capture failed.";
+                captureButton.disabled = false;
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", blob, "camera_capture.jpg");
+
+            try {
+                const response = await fetch("/camera-detect", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || "Detection failed.");
+                }
+
+                // SAVE DETECTIONS FOR REPORTING
+                window.cameraDetections = data.detections || [];
+
+                statusText.textContent =
+                    "AI detection completed successfully.";
+
+                let html = `
+                    <h3>Camera Detection Results</h3>
+                    <img src="${data.result_image}" alt="YOLO detection result">
+                    <h3>Detected Objects: ${data.count}</h3>
+                `;
+
+                if (window.cameraDetections.length > 0) {
+
+                    window.cameraDetections.forEach(function (item) {
+                        html += `
+                            <div class="camera-detection">
+                                <span>${item.name}</span>
+                                <strong>${item.confidence}% confidence</strong>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                        <button
+                            type="button"
+                            class="report-detected-button"
+                            id="reportDetectedItem">
+                            Report This Found Item
+                        </button>
+                    `;
+
+                } else {
+                    html += `
+                        <p>No objects detected. Try another image.</p>
+                    `;
+                }
+
+                resultsDiv.innerHTML = html;
+
+                // OPEN FOUND REPORT WITH DETECTED OBJECT NAME
+                const reportButton =
+                    document.getElementById("reportDetectedItem");
+
+                if (reportButton) {
+                    reportButton.addEventListener("click", function () {
+
+                        const bestDetection = window.cameraDetections.reduce(
+                            (best, current) =>
+                                current.confidence > best.confidence
+                                    ? current
+                                    : best
+                        );
+
+                        const itemName = bestDetection.name;
+
+                        window.location.href =
+                            "/report/found?item_name=" +
+                            encodeURIComponent(itemName);
+                    });
+                }
+
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = error.message;
+            }
+
+            captureButton.disabled = false;
+
+        }, "image/jpeg", 0.90);
+    });
+
+    // STOP CAMERA
+    stopButton.addEventListener("click", function () {
+
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+            video.srcObject = null;
+        }
+
+        captureButton.disabled = true;
+        stopButton.disabled = true;
+        startButton.disabled = false;
+
+        statusText.textContent = "Camera stopped.";
+    });
+</script>
+
+</body>
+</html>

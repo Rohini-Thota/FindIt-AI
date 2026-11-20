@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Reports | FindIt AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">FindIt <span>AI</span></div>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="hero">
+            <p class="tag">COMMUNITY REPORTS</p>
+            <h1>Lost & Found <span>Reports</span></h1>
+            <p>Browse items reported by the community.</p>
+        </section>
+
+        <section class="upload-card">
+            <h2>All Reports</h2>
+
+            {% if reports %}
+
+                {% for report in reports %}
+
+                    <div class="detection report-card">
+
+                        <div class="report-details">
+
+                            <h3>{{ report.item_name }}</h3>
+
+                            <p>
+                                <strong>Category:</strong>
+                                {{ report.category or 'Not specified' }}
+                            </p>
+
+                            <p>
+                                <strong>Description:</strong>
+                                {{ report.description or 'No description provided' }}
+                            </p>
+
+                            <p>
+                                <strong>Location:</strong>
+                                {{ report.location }}
+                            </p>
+
+                            <p>
+                                <strong>Date:</strong>
+                                {{ report.report_date }}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>
+
+                                <span class="status-badge {{ report.report_type }}">
+                                    {{ report.report_type | upper }}
+                                </span>
+                            </p>
+
+                            {% if report.image_filename %}
+                                <img
+                                    src="{{ url_for('static', filename='uploads/' + report.image_filename) }}"
+                                    alt="{{ report.item_name }}"
+                                    class="report-image"
+                                >
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No reports have been submitted yet.</p>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+    <footer>
+        FindIt AI · AI-Powered Lost and Found Portal
+    </footer>
+
+</body>
+</html>

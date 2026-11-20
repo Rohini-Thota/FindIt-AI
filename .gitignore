@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+*.db
+*.sqlite
+.vscode/
+# Dataset and training files
+dataset/
+notebooks/
+runs/
+
+# Generated detection images
+static/uploads/*
+
+# Testing scripts (not needed for deployment)
+test_email.py
+test_sms.py
+
+# Local database
+*.db
+*.sqlite
+dataset/

@@ -1,0 +1,181 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0b1020;
+    color: #f4f5ff;
+    min-height: 100vh;
+}
+
+header {
+    padding: 24px 9%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #252d48;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.logo span, .hero span {
+    color: #9b83ff;
+}
+
+nav, .hero p, .upload-card p {
+    color: #aab2cc;
+}
+
+main {
+    width: 90%;
+    max-width: 900px;
+    margin: 65px auto;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.tag {
+    color: #a895ff !important;
+    letter-spacing: 3px;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 7vw, 65px);
+    line-height: 1.1;
+    margin-bottom: 18px;
+}
+
+.upload-card, .results {
+    background: #151d34;
+    border: 1px solid #303b5c;
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 25px;
+}
+
+.upload-card h2, .results h2 {
+    margin-bottom: 12px;
+}
+
+input[type="file"] {
+    display: block;
+    width: 100%;
+    margin: 25px 0;
+    padding: 15px;
+    border: 1px dashed #7770bd;
+    border-radius: 10px;
+    color: white;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #7961ed;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #927eff;
+}
+
+.result-img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: contain;
+    margin: 20px 0;
+    border-radius: 12px;
+    background: #080d19;
+}
+
+.detection {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 14px;
+    margin-top: 10px;
+    background: #202a45;
+    border-radius: 8px;
+}
+
+.detection strong {
+    color: #a895ff;
+}
+
+.message {
+    color: #ffaaaa !important;
+    margin-top: 15px;
+}
+
+.disclaimer {
+    color: #aab2cc;
+    font-size: 13px;
+    margin-top: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #858da7;
+}
+
+/* Report card layout */
+.report-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.report-details {
+    width: 100%;
+    min-width: 0;
+}
+
+.report-image {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    max-height: 320px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-top: 14px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status-badge.lost {
+    background: rgba(255, 100, 100, 0.15);
+    color: #ff8585;
+}
+
+.status-badge.found {
+    background: rgba(80, 220, 150, 0.15);
+    color: #62dfa2;
+}

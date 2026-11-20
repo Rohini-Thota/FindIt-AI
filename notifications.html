@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | FindIt AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .notifications-container {
+            max-width: 950px;
+            margin: 45px auto;
+            padding: 20px;
+            color: white;
+        }
+
+        .notification-card {
+            background: #171f38;
+            border: 1px solid #303b5c;
+            border-radius: 12px;
+            padding: 22px;
+            margin: 18px 0;
+        }
+
+        .notification-card h3 { color: #c9c4ff; }
+        .notification-card p { color: #d0d7eb; }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: #303b5c;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">FindIt <span>AI</span></div>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/report/lost">Report Lost</a>
+        <a href="/report/found">Report Found</a>
+        <a href="/reports">View Reports</a>
+        <a href="/notifications">Notifications</a>
+    </nav>
+</header>
+
+<main class="notifications-container">
+    <h1>Match Notifications</h1>
+    <p>Potential matches between lost and found items.</p>
+
+    {% if notifications %}
+        {% for notification in notifications %}
+        <div class="notification-card">
+            <h3>
+                {{ notification.lost_item_name or 'Lost item' }}
+                ↔
+                {{ notification.found_item_name or 'Found item' }}
+            </h3>
+
+            <p><strong>Lost Report ID:</strong> {{ notification.lost_report_id }}</p>
+            <p><strong>Found Report ID:</strong> {{ notification.found_report_id }}</p>
+            <p><strong>Channel:</strong> {{ notification.channel }}</p>
+            <p><strong>Status:</strong>
+                <span class="status">{{ notification.status }}</span>
+            </p>
+            <p><strong>Date:</strong> {{ notification.created_at }}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <h2>No Notifications Yet</h2>
+        <p>Potential matches will appear here after a found-item report matches a lost-item report.</p>
+    {% endif %}
+</main>
+
+</body>
+</html>

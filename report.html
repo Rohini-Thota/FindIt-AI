@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Reports | FindIt AI</title>
+    <style>
+        body { background:#0b1020; color:#f4f4ff; font-family:Arial,sans-serif; padding:30px; }
+        .report { background:#171f38; padding:20px; margin:15px 0; border-radius:12px; }
+        .lost { color:#ff8585; }
+        .found { color:#74e0ae; }
+        img { max-width:180px; border-radius:8px; display:block; margin-top:12px; }
+        a { color:#ad96ff; }
+    </style>
+</head>
+<body>
+    <h1>FindIt AI — Item Reports</h1>
+    <p><a href="/">Home</a> | <a href="/report/lost">Report Lost</a> | <a href="/report/found">Report Found</a></p>
+
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    {% if reports %}
+        {% for report in reports %}
+            <div class="report">
+                <h2 class="{{ report['report_type'] }}">
+                    {{ report['report_type']|upper }} — {{ report['item_name'] }}
+                </h2>
+                <p><b>Category:</b> {{ report['category'] or 'Not specified' }}</p>
+                <p><b>Description:</b> {{ report['description'] or 'Not provided' }}</p>
+                <p><b>Location:</b> {{ report['location'] }}</p>
+                <p><b>Date:</b> {{ report['report_date'] }}</p>
+                <p><b>Contact:</b> {{ report['contact'] }}</p>
+                {% if report['image_filename'] %}
+                    <img src="{{ url_for('static', filename='uploads/' + report['image_filename']) }}" alt="Reported item">
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No reports have been submitted yet.</p>
+    {% endif %}
+</body>
+</html>

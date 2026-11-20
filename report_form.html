@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Report {{ report_type|title }} Item | FindIt AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background: #0b1020;
+            color: #f4f4ff;
+            font-family: Arial, sans-serif;
+            padding: 35px 15px;
+        }
+
+        .form-card {
+            max-width: 650px;
+            margin: auto;
+            background: #171f38;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #303c60;
+        }
+
+        .form-card h1 {
+            text-transform: capitalize;
+            margin-bottom: 10px;
+        }
+
+        .form-card h3 {
+            margin-top: 25px;
+            color: #b49aff;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px;
+            margin: 8px 0 18px;
+            border-radius: 8px;
+            border: 1px solid #455071;
+            background: #0d1429;
+            color: white;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #a58aff;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: 0;
+            border-radius: 9px;
+            background: #8060f5;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #967cff;
+            transform: translateY(-2px);
+        }
+
+        a {
+            color: #ad96ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .form-note {
+            color: #aeb8d3;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: -5px;
+            margin-bottom: 20px;
+        }
+
+        .privacy-note {
+            background: #202b49;
+            border: 1px solid #39466b;
+            padding: 13px;
+            border-radius: 9px;
+            color: #c8d2ed;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .flash-message {
+            background: #342849;
+            border: 1px solid #8060f5;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #e3d9ff;
+        }
+
+        .required {
+            color: #ff8585;
+        }
+
+        .back-links {
+            margin-top: 22px;
+            font-size: 14px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 5px 0 22px;
+            color: #c8d2ed;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .checkbox-row input {
+            width: auto;
+            margin: 2px 0 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="form-card">
+
+        <h1>Report a {{ report_type }} item</h1>
+
+        <p>Provide the details below to submit your report.</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="flash-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <!-- ITEM DETAILS -->
+
+            <h3>Item Information</h3>
+
+            <label>Item Name <span class="required">*</span></label>
+            <input
+                type="text"
+                name="item_name"
+                placeholder="Example: Black handbag"
+                maxlength="100"
+                required
+            >
+
+            <label>Category</label>
+            <select name="category">
+                <option value="">Select category</option>
+
+                {% for category in [
+                    "Bottle", "Handbag", "Headphones", "ID",
+                    "Keyboard", "Keys", "Laptop",
+                    "Luggage-and-bags", "Mouse", "Phone",
+                    "Shoes", "Suitcase", "Wallet", "Wires", "Other"
+                ] %}
+                    <option value="{{ category }}">
+                        {{ category }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label>Description</label>
+            <textarea
+                name="description"
+                rows="4"
+                maxlength="500"
+                placeholder="Describe the item's colour, brand or identifying features"
+            ></textarea>
+
+            <label>Location <span class="required">*</span></label>
+            <input
+                type="text"
+                name="location"
+                placeholder="Where was it lost or found?"
+                maxlength="200"
+                required
+            >
+
+            <label>Date <span class="required">*</span></label>
+            <input
+                type="date"
+                name="report_date"
+                required
+            >
+
+            <!-- CONTACT DETAILS -->
+
+            <h3>Contact Details</h3>
+
+            <p class="form-note">
+                These details will help FindIt AI notify you when a
+                potential match is identified.
+            </p>
+
+            <div class="privacy-note">
+                <strong>Privacy protection</strong><br>
+                Your email address and mobile number will not be
+                displayed in public reports. They will be used
+                privately for match notifications.
+            </div>
+
+            <label>Email Address <span class="required">*</span></label>
+            <input
+                type="email"
+                name="email"
+                placeholder="example@gmail.com"
+                maxlength="254"
+                required
+            >
+
+            <label>Mobile Number <span class="required">*</span></label>
+            <input
+                type="tel"
+                name="phone"
+                placeholder="+919876543210"
+                pattern="\+?[0-9]{10,15}"
+                title="Enter a valid mobile number with country code"
+                required
+            >
+
+            <p class="form-note">
+                Include your country code, for example +91 for India.
+            </p>
+
+            <!-- IMAGE -->
+
+            <h3>Upload Item Image</h3>
+
+            <input
+                type="file"
+                name="image"
+                accept=".jpg,.jpeg,.png,.webp"
+            >
+
+            <p class="form-note">
+                Upload a clear image to help identify the item.
+            </p>
+
+            <!-- CONFIRMATION -->
+
+            <div class="checkbox-row">
+                <input
+                    type="checkbox"
+                    id="confirmDetails"
+                    required
+                >
+
+                <label for="confirmDetails">
+                    I confirm that the information and contact details
+                    provided above are correct.
+                </label>
+            </div>
+
+            <button type="submit">
+                Submit {{ report_type|title }} Report
+            </button>
+
+        </form>
+
+        <div class="back-links">
+            <a href="{{ url_for('index') }}">Back to FindIt AI</a>
+            |
+            <a href="{{ url_for('view_reports') }}">View Reports</a>
+        </div>
+
+    </div>
+
+</body>
+</html>
